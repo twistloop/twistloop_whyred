@@ -1562,7 +1562,7 @@ static u32 tcp_tso_autosize(const struct sock *sk, unsigned int mss_now)
 {
 	u32 bytes, segs;
 
-	bytes = min(sk->sk_pacing_rate >> sk->sk_pacing_shift,
+	bytes = min(sk->sk_pacing_rate >> 10,
 		    sk->sk_gso_max_size - 1 - MAX_TCP_HEADER);
 
 	/* Goal is to send at least one packet per ms,
@@ -2050,7 +2050,7 @@ static bool tcp_small_queue_check(struct sock *sk, const struct sk_buff *skb,
 {
 	unsigned int limit;
 
-	limit = max(2 * skb->truesize, sk->sk_pacing_rate >> sk->sk_pacing_shift);
+	limit = max(2 * skb->truesize, sk->sk_pacing_rate >> 10);
 	limit = min_t(u32, limit, sysctl_tcp_limit_output_bytes);
 	limit <<= factor;
 
@@ -2608,6 +2608,7 @@ int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
 	unsigned int cur_mss;
 	int diff, len, err;
 
+
 	/* Inconclusive MTU probe */
 	if (icsk->icsk_mtup.probe_size)
 		icsk->icsk_mtup.probe_size = 0;
@@ -2835,6 +2836,9 @@ begin_fwd:
 
 		if (sacked & (TCPCB_SACKED_ACKED|TCPCB_SACKED_RETRANS))
 			continue;
+
+		if (tcp_small_queue_check(sk, skb, 1))
+			return;
 
 		if (tcp_retransmit_skb(sk, skb, segs))
 			return;
