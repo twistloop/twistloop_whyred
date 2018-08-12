@@ -50,6 +50,7 @@
 #include <linux/mdss_io_util.h>
 #include <linux/wakelock.h>
 #include <linux/cpu_input_boost.h>
+#include <linux/devfreq_boost.h>
 #include <sync.h>
 #include <sw_sync.h>
 
@@ -5595,6 +5596,7 @@ int mdss_fb_do_ioctl(struct fb_info *info, unsigned int cmd,
 		break;
 	case MSMFB_ATOMIC_COMMIT:
 		cpu_input_boost_kick();
+		devfreq_boost_kick(DEVFREQ_MSM_CPUBW);
 		ret = mdss_fb_atomic_commit_ioctl(info, argp, file);
 		break;
 
