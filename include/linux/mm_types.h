@@ -529,7 +529,6 @@ struct mm_struct {
 	bool tlb_flush_batched;
 #endif
 	struct uprobes_state uprobes_state;
-	struct work_struct async_put_work;
 #ifdef CONFIG_X86_INTEL_MPX
 	/* address of the bounds directory */
 	void __user *bd_addr;
