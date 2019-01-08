@@ -128,9 +128,13 @@ static long sdcardfs_unlocked_ioctl(struct file *file, unsigned int cmd,
 		err = lower_file->f_op->unlocked_ioctl(lower_file, cmd, arg);
 
 	/* some ioctls can change inode attributes (EXT2_IOC_SETFLAGS) */
-	if (!err)
+	if (!err) {
 		sdcardfs_copy_and_fix_attrs(file_inode(file),
 				      file_inode(lower_file));
+
+		fsstack_copy_inode_size(file_inode(file),
+				      file_inode(lower_file));
+	}
 	revert_fsids(saved_cred);
 out:
 	return err;
@@ -158,7 +162,6 @@ static long sdcardfs_compat_ioctl(struct file *file, unsigned int cmd,
 		err = -ENOMEM;
 		goto out;
 	}
-
 	if (lower_file->f_op->compat_ioctl)
 		err = lower_file->f_op->compat_ioctl(lower_file, cmd, arg);
 
@@ -254,7 +257,6 @@ static int sdcardfs_open(struct inode *inode, struct file *file)
 		err = -ENOMEM;
 		goto out_err;
 	}
-
 	file->private_data =
 		kzalloc(sizeof(struct sdcardfs_file_info), GFP_KERNEL);
 	if (!SDCARDFS_F(file)) {
@@ -279,8 +281,10 @@ static int sdcardfs_open(struct inode *inode, struct file *file)
 
 	if (err)
 		kfree(SDCARDFS_F(file));
-	else
+	else {
 		sdcardfs_copy_and_fix_attrs(inode, sdcardfs_lower_inode(inode));
+		fsstack_copy_inode_size(inode, sdcardfs_lower_inode(inode));
+	}
 
 out_revert_cred:
 	revert_fsids(saved_cred);

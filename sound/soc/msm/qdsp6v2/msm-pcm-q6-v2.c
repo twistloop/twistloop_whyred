@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1160,8 +1161,8 @@ static int msm_pcm_adsp_stream_cmd_put(struct snd_kcontrol *kcontrol,
 		goto done;
 	}
 
-	if (event_data->payload_len > sizeof(ucontrol->value.bytes.data)
-			- sizeof(struct msm_adsp_event_data)) {
+	if ((sizeof(struct msm_adsp_event_data) + event_data->payload_len) >=
+					sizeof(ucontrol->value.bytes.data)) {
 		pr_err("%s param length=%d  exceeds limit",
 			__func__, event_data->payload_len);
 		ret = -EINVAL;

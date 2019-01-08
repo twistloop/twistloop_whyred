@@ -1,4 +1,5 @@
-/* Copyright (c) 2014-2018, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2014-2017, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1984,7 +1985,7 @@ static void a5xx_start(struct adreno_device *adreno_dev)
 		kgsl_regwrite(device, A5XX_PC_DBG_ECO_CNTL,
 						(0x100 << 11 | 0x100 << 22));
 	else if (adreno_is_a510(adreno_dev) || adreno_is_a512(adreno_dev) ||
-			adreno_is_a509(adreno_dev))
+		adreno_is_a509(adreno_dev))
 		kgsl_regwrite(device, A5XX_PC_DBG_ECO_CNTL,
 						(0x200 << 11 | 0x200 << 22));
 	else

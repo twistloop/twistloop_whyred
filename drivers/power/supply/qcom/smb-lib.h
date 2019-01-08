@@ -1,4 +1,4 @@
-/* Copyright (c) 2016-2017 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2016-2018 The Linux Foundation. All rights reserved.
  * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -269,7 +269,7 @@ struct smb_charger {
 	struct power_supply		*usb_main_psy;
 	struct power_supply		*usb_port_psy;
 	enum power_supply_type		real_charger_type;
-	struct power_supply		*pl_psy;
+	struct power_supply             *pl_psy;
 
 	/* notifiers */
 	struct notifier_block	nb;
@@ -363,8 +363,11 @@ struct smb_charger {
 	bool			cc2_detach_wa_active;
 	bool			typec_en_dis_active;
 	bool			try_sink_active;
+	bool			float_rerun_apsd;
 	int			boost_current_ua;
 	int			temp_speed_reading_count;
+	int			qc2_max_pulses;
+    bool		non_compliant_chg_detected;
 
 	/* extcon for VBUS / ID notification to USB for uUSB */
 	struct extcon_dev	*extcon;
@@ -376,6 +379,10 @@ struct smb_charger {
 	/* qnovo */
 	int			usb_icl_delta_ua;
 	int			pulse_cnt;
+
+#if defined(CONFIG_KERNEL_CUSTOM_WHYRED)
+	int			die_health;
+#endif
 };
 
 int smblib_read(struct smb_charger *chg, u16 addr, u8 *val);
@@ -540,6 +547,8 @@ void smblib_usb_typec_change(struct smb_charger *chg);
 int smblib_get_prop_battery_full_design(struct smb_charger *chg,
 				     union power_supply_propval *val);
 
+int smblib_set_prop_rerun_apsd(struct smb_charger *chg,
+				const union power_supply_propval *val);
 
 int smblib_init(struct smb_charger *chg);
 int smblib_deinit(struct smb_charger *chg);

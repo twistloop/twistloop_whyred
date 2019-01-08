@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1596,6 +1597,7 @@ static void fastrpc_smd_read_handler(int cid)
 			break;
 		index = (uint32_t)((rsp.ctx & FASTRPC_CTXID_MASK) >> 4);
 		VERIFY(err, index < FASTRPC_CTX_MAX);
+
 		if (err)
 			goto bail;
 
@@ -2479,6 +2481,11 @@ static int fastrpc_file_free(struct fastrpc_file *fl)
 
 	if (!fl->sctx)
 		goto bail;
+
+	if (!fl->sctx) {
+		kfree(fl);
+		return 0;
+	}
 
 	spin_lock(&fl->hlock);
 	fl->file_close = 1;

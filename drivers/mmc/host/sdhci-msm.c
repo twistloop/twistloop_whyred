@@ -4245,6 +4245,9 @@ static bool sdhci_msm_is_bootdevice(struct device *dev)
 	return true;
 }
 
+/* add sensor info for factory mode
+ *    begin
+ *    */
 static struct kobject *card_slot_device;
 static struct sdhci_host *card_host;
 static ssize_t card_slot_status_show(struct device *dev,
@@ -4259,7 +4262,7 @@ static DEVICE_ATTR(card_slot_status, S_IRUGO ,
 int32_t card_slot_init_device_name(void)
 {
 	int32_t error = 0;
-	if (card_slot_device != NULL) {
+	if (card_slot_device != NULL){
 		pr_err("card_slot already created\n");
 		return 0;
 	}
@@ -4277,6 +4280,9 @@ int32_t card_slot_init_device_name(void)
 
 	return 0 ;
 }
+/* add card slot info for factory mode
+ *    end
+ *    */
 
 static int sdhci_msm_probe(struct platform_device *pdev)
 {
@@ -4778,7 +4784,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 		ret = device_create_file(&pdev->dev, &msm_host->polling);
 		if (ret)
 			goto remove_max_bus_bw_file;
-	} else {
+	}else{
 		card_host = dev_get_drvdata(&pdev->dev);
 		card_slot_init_device_name();
 	}
