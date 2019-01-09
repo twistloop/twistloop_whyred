@@ -2172,8 +2172,6 @@ static int smblib_force_vbus_voltage(struct smb_charger *chg, u8 val)
 #define MAX_PLUSE_COUNT_ALLOWED 8
 #elif (defined(CONFIG_KERNEL_CUSTOM_WHYRED) || defined (CONFIG_KERNEL_CUSTOM_TULIP))
 #define MAX_PLUSE_COUNT_ALLOWED 15
-#elif defined(CONFIG_KERNEL_CUSTOM_TULIP)
-#define MAX_PLUSE_COUNT_ALLOWED 15
 #endif
 
 int smblib_dp_dm(struct smb_charger *chg, int val)
