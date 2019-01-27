@@ -22,7 +22,6 @@
 #define SET_DELAY (2 * HZ)
 #define PROC_AWAKE_ID 12 /* 12th bit */
 #if defined(CONFIG_KERNEL_CUSTOM_WAYNE) || defined(CONFIG_KERNEL_CUSTOM_WHYRED)
-int PROC_AWAKE_ID = 12; /* 12th bit */
 int slst_gpio_base_id;
 #else
 static int slst_gpio_base_id;
