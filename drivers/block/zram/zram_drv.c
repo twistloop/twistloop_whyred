@@ -40,11 +40,7 @@ static DEFINE_IDR(zram_index_idr);
 static DEFINE_MUTEX(zram_index_mutex);
 
 static int zram_major;
-#ifdef CONFIG_ZRAM_LZ4_COMPRESS
 static const char *default_compressor = "lz4";
-#else
-static const char *default_compressor = "lzo";
-#endif
 
 /* Module params (documentation at end) */
 static unsigned int num_devices = 1;
@@ -1369,7 +1365,7 @@ compress_again:
 		return ret;
 	}
 
-	if (comp_len >= huge_class_size)
+	if (comp_len >= max_zpage_size)
 		comp_len = PAGE_SIZE;
 	/*
 	 * handle allocation has 2 paths:
