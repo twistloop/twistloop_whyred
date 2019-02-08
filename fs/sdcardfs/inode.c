@@ -21,7 +21,6 @@
 #include "sdcardfs.h"
 #include <linux/fs_struct.h>
 #include <linux/ratelimit.h>
-#include <linux/sched.h>
 
 const struct cred *override_fsids(struct sdcardfs_sb_info *sbi,
 		struct sdcardfs_inode_data *data)
@@ -81,6 +80,7 @@ static int sdcardfs_create(struct inode *dir, struct dentry *dentry,
 					SDCARDFS_I(dir)->data);
 	if (!saved_cred)
 		return -ENOMEM;
+
 	sdcardfs_get_lower_path(dentry, &lower_path);
 	lower_dentry = lower_path.dentry;
 	lower_dentry_mnt = lower_path.mnt;
@@ -146,6 +146,7 @@ static int sdcardfs_unlink(struct inode *dir, struct dentry *dentry)
 						SDCARDFS_I(dir)->data);
 	if (!saved_cred)
 		return -ENOMEM;
+
 	sdcardfs_get_lower_path(dentry, &lower_path);
 	lower_dentry = lower_path.dentry;
 	lower_mnt = lower_path.mnt;
@@ -308,7 +309,7 @@ static int sdcardfs_mkdir(struct inode *dir, struct dentry *dentry, umode_t mode
 				&& (qstr_case_eq(&dentry->d_name, &q_data)))) {
 		revert_fsids(saved_cred);
 		saved_cred = override_fsids(sbi,
-					SDCARDFS_I(dentry->d_inode)->data);
+					SDCARDFS_I(d_inode(dentry))->data);
 		if (!saved_cred) {
 			pr_err("sdcardfs: failed to set up .nomedia in %s: %d\n",
 						lower_path.dentry->d_name.name,
@@ -328,6 +329,7 @@ out:
 	task_lock(current);
 	current->fs = saved_fs;
 	task_unlock(current);
+
 	free_fs_struct(copied_fs);
 out_unlock:
 	sdcardfs_put_lower_path(dentry, &lower_path);
@@ -523,7 +525,7 @@ static const char *sdcardfs_follow_link(struct dentry *dentry, void **cookie)
 
 static int sdcardfs_permission_wrn(struct inode *inode, int mask)
 {
-	pr_debug("sdcardfs does not support permission. Use permission2.\n");
+	WARN_RATELIMIT(1, "sdcardfs does not support permission. Use permission2.\n");
 	return -EINVAL;
 }
 
@@ -768,10 +770,7 @@ static int sdcardfs_getattr(struct vfsmount *mnt, struct dentry *dentry,
 		goto out;
 	sdcardfs_copy_and_fix_attrs(d_inode(dentry),
 			      d_inode(lower_path.dentry));
-
-        fsstack_copy_inode_size(d_inode(dentry), d_inode(lower_path.dentry));
 	err = sdcardfs_fillattr(mnt, d_inode(dentry), &lower_stat, stat);
-	stat->blocks = lower_stat.blocks;
 out:
 	sdcardfs_put_lower_path(dentry, &lower_path);
 	return err;
